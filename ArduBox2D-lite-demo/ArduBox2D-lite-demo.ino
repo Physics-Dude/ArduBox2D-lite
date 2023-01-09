@@ -112,7 +112,7 @@ void loop() {
   arduboy.pollButtons();
   arduboy.clear();
 
-  if (isRunning)world.Step(timeStep);
+  if (isRunning) world.Step(timeStep);
 
   for (int i = 0; i < numBodies; ++i)
     DrawBody(bodies + i);
