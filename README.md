@@ -20,7 +20,7 @@ This was initially done in the Arduino IDE v1.8.19 with libraries available in t
 ***Info:***  
 Everything in the Box2D-lite library is still here except for "joints". I was fighting with space constraints of the ATMEGA32u4 prior to moving to fixed point math.  
 
-No optimizations have been made. This is a simple adaption of Demo4 in the Box2D-lite sample program. Other demos not involving joints should still work as well. Visit the original Box2D-lite repasotory for more info.  
+No optimizations have been made as of the initial release. This is a simple adaption of Demo4 in the Box2D-lite sample program. Other demos not involving joints should still work as well. Visit the original Box2D-lite repasotory for more info. Feel free to contrbute to this project futrher.
 
 ***Further reading:***  
 - Required: Pharap's FixedPointsArduino: https://github.com/Pharap/FixedPointsArduino/  
