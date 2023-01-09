@@ -1,6 +1,6 @@
 /*
-  This is a proof of concept program for the Arduboy and other small micros that simulates the physics of 
-  multiple rigid bodies in 2D space. Complete with complex collisions! It is a modification of Box2D-lite 
+  This is a proof of concept program for the Arduboy and other small micros that simulates the physics of
+  multiple rigid bodies in 2D space. Complete with complex collisions! It is a modification of Box2D-lite
   that uses Pharap's FixedPointsArduino library in place of all the floating point operations.
 
   More info: https://github.com/Physics-Dude/ArduBox2D-lite
@@ -32,7 +32,7 @@ Arduboy2 arduboy;
 const SQ7x8 FLT_MAX = 127.99; //temp
 
 namespace {
-Body bodies[4];
+Body bodies[5];
 SQ7x8 timeStep = 1.0 / 60.0;
 int iterations = 2;
 Vec2 gravity(0.0, -10.0);
@@ -61,7 +61,14 @@ static void DrawBody(Body* body) {
 }
 
 // A vertical stack with spinning toy
-static void Demo4(Body* b) {
+static void Demo4(Body* b, bool oneMore = false) {
+  if (oneMore) {
+    b->Set(Vec2(7.0, 5.0), 1.0);
+    b->position.Set(22, 45);
+    world.Add(b);
+    ++b; ++numBodies;
+  }
+
   //the floor
   b->Set(Vec2(100.0, 20.0), FLT_MAX);
   b->friction = 0.2;
@@ -98,17 +105,36 @@ void setup() {
   Demo4(bodies);
 }
 
+bool isRunning = true;
 void loop() {
   if (!arduboy.nextFrame())
     return;
   arduboy.pollButtons();
   arduboy.clear();
 
-  world.Step(timeStep);
+  if (isRunning)world.Step(timeStep);
 
   for (int i = 0; i < numBodies; ++i)
     DrawBody(bodies + i);
 
+  // Create a new body
+  if (arduboy.justPressed(RIGHT_BUTTON | LEFT_BUTTON | UP_BUTTON | DOWN_BUTTON )) {
+    world.Clear();
+    numBodies = 0;
+    Demo4(bodies, true);
+  }
 
+  //Reset the simulation.
+  if (arduboy.justPressed(B_BUTTON)) {
+    world.Clear();
+    numBodies = 0;
+    Demo4(bodies);
+  }
+  
+  //pause
+  if (arduboy.justPressed(A_BUTTON)) {
+    isRunning = !isRunning;
+  }
+  
   arduboy.display();
 }
