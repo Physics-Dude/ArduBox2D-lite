@@ -11,7 +11,7 @@
   - Crudely modified to to use SQ7x8 fixed point numbers instead of floating points for small micros
   - Required: Pharap's  FixedPointsArduino library https://github.com/Pharap/FixedPointsArduino/
   -           mike-matera's ArduinoSTL library https://github.com/mike-matera/ArduinoSTL
-    
+
 */
 
 #include "Arbiter.h"
@@ -186,15 +186,13 @@ void Arbiter::ApplyImpulse()
 
       // Clamp friction
       SQ7x8 oldTangentImpulse = c->Pt;
-      //c->Pt = Clamp(oldTangentImpulse + dPt, -maxPt, maxPt);
-      c->Pt = constrain(oldTangentImpulse + dPt, -maxPt, maxPt);
+      c->Pt = Clamp(oldTangentImpulse + dPt, -maxPt, maxPt);
       dPt = c->Pt - oldTangentImpulse;
     }
     else
     {
       SQ7x8 maxPt = friction * dPn;
-     // dPt = Clamp(dPt, -maxPt, maxPt);
-      dPt = constrain(dPt, -maxPt, maxPt);
+      dPt = Clamp(dPt, -maxPt, maxPt);
     }
 
     // Apply contact impulse
