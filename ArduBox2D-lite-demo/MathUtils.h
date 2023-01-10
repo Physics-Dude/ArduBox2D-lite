@@ -29,20 +29,27 @@
 
 const SQ7x8 k_pi = 3.14159;
 
+//PROGMEM const int16_t sinTable[] = {numbersnumbersnumbers};
+
 struct Vec2
 {
   Vec2() {}
   Vec2(SQ7x8 x, SQ7x8 y) : x(x), y(y) {}
 
-  void Set(SQ7x8 x_, SQ7x8 y_) { x = x_; y = y_; }
+  void Set(SQ7x8 x_, SQ7x8 y_) {
+    x = x_;
+    y = y_;
+  }
 
-  Vec2 operator -() { return Vec2(-x, -y); }
-  
+  Vec2 operator -() {
+    return Vec2(-x, -y);
+  }
+
   void operator += (const Vec2& v)
   {
     x += v.x; y += v.y;
   }
-  
+
   void operator -= (const Vec2& v)
   {
     x -= v.x; y -= v.y;
@@ -62,13 +69,38 @@ struct Vec2
   SQ7x8 x, y;
 };
 
-struct Mat22
-{
+//Just some output from ChatGPT. untested and probably not right. needs sin table.
+//might be able to use SQ1x6 or SQ1x14...
+//or.. binrads
+/*
+  SQ7x8 fixedMod(SQ7x8 angle, SQ7x8 mod) {
+    return angle - mod * floor(angle / mod);
+  }
+
+  SQ7x8 fixedSin(SQ7x8 angle) {
+  angle = fixedMod(angle, SQ7x8(2*PI));
+  if (angle < 0) {
+    angle += SQ7x8(2*PI);
+  }
+  return sinTable[(int)(angle / (SQ7x8(PI/32))]];
+  }
+
+  SQ7x8 fixedCos(SQ7x8 angle) {
+  angle = fixedMod(angle + (SQ7x8)(PI/2), SQ7x8(2*PI));
+  if (angle < 0) {
+    angle += (SQ7x8)(2*PI);
+  }
+  return sinTable[(int)(angle / (SQ7x8(PI/32))];
+  }
+*/
+
+struct Mat22 {
   Mat22() {}
   Mat22(SQ7x8 angle)
   {
     SQ7x8 c = cos(static_cast<float>(angle)), s = sin(static_cast<float>(angle));
-    //SQ7x8 c = cosf(static_cast<float>(angle)), s = sinf(static_cast<float>(angle));
+    //SQ7x8 c = fixedCos(angle), s = fixedSin(angle);
+
     col1.x = c; col2.x = -s;
     col1.y = s; col2.y = c;
   }
@@ -175,12 +207,11 @@ inline SQ7x8 Max(SQ7x8 a, SQ7x8 b)
 {
   return a > b ? a : b;
 }
-/* //using arduino's constrain()
 inline SQ7x8 Clamp(SQ7x8 a, SQ7x8 low, SQ7x8 high)
 {
   return Max(low, Min(a, high));
 }
-*/
+
 template<typename T> inline void Swap(T& a, T& b)
 {
   T tmp = a;
