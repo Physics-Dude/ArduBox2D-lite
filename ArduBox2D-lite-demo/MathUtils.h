@@ -22,6 +22,8 @@
 #include <FixedPointsCommon.h>
 #include <ArduinoSTL.h>
 
+#include "Trig.h"
+
 //#include <math.h>
 //#include <float.h>
 #include <assert.h>
@@ -69,36 +71,13 @@ struct Vec2
   SQ7x8 x, y;
 };
 
-//Just some output from ChatGPT. untested and probably not right. needs sin table.
-//might be able to use SQ1x6 or SQ1x14...
-//or.. binrads
-/*
-  SQ7x8 fixedMod(SQ7x8 angle, SQ7x8 mod) {
-    return angle - mod * floor(angle / mod);
-  }
-
-  SQ7x8 fixedSin(SQ7x8 angle) {
-  angle = fixedMod(angle, SQ7x8(2*PI));
-  if (angle < 0) {
-    angle += SQ7x8(2*PI);
-  }
-  return sinTable[(int)(angle / (SQ7x8(PI/32))]];
-  }
-
-  SQ7x8 fixedCos(SQ7x8 angle) {
-  angle = fixedMod(angle + (SQ7x8)(PI/2), SQ7x8(2*PI));
-  if (angle < 0) {
-    angle += (SQ7x8)(2*PI);
-  }
-  return sinTable[(int)(angle / (SQ7x8(PI/32))];
-  }
-*/
-
 struct Mat22 {
   Mat22() {}
   Mat22(SQ7x8 angle)
   {
-    SQ7x8 c = cos(static_cast<float>(angle)), s = sin(static_cast<float>(angle));
+    SQ7x8 c = cosFixed(static_cast<uint8_t>(radiansToBrads(angle))),
+          s = sinFixed(static_cast<uint8_t>(radiansToBrads(angle)));
+    //SQ7x8 c = cos(static_cast<float>(angle)), s = sin(static_cast<float>(angle));
     //SQ7x8 c = fixedCos(angle), s = fixedSin(angle);
 
     col1.x = c; col2.x = -s;
