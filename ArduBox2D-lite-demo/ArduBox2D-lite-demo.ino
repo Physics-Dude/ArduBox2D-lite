@@ -35,10 +35,11 @@ namespace {
 Body bodies[5];
 SQ7x8 timeStep = 1.0 / 60.0;
 int iterations = 2;
-Vec2 gravity(0.0, -10.0);
+Vec2 gravity(0.0, -9.8);
 int numBodies = 0;
-int width = 64;
-int height = 60;
+int width = 128;
+int height = 64;
+int simCenterX = 64; //x pos for sim 0,0
 World world(gravity, iterations);
 }
 
@@ -53,46 +54,46 @@ static void DrawBody(Body* body) {
   Vec2 v3 = x + R * Vec2( h.x,  h.y);
   Vec2 v4 = x + R * Vec2(-h.x,  h.y);
 
-  //Should probably round these
-  arduboy.drawLine(v1.x.getInteger(), height - v1.y.getInteger(), v2.x.getInteger(), height - v2.y.getInteger(), WHITE);
-  arduboy.drawLine(v2.x.getInteger(), height - v2.y.getInteger(), v3.x.getInteger(), height - v3.y.getInteger(), WHITE);
-  arduboy.drawLine(v3.x.getInteger(), height - v3.y.getInteger(), v4.x.getInteger(), height - v4.y.getInteger(), WHITE);
-  arduboy.drawLine(v4.x.getInteger(), height - v4.y.getInteger(), v1.x.getInteger(), height - v1.y.getInteger(), WHITE);
+  arduboy.drawLine((int8_t)roundFixed(v1.x) + simCenterX, height - (int8_t)roundFixed(v1.y), (int8_t)roundFixed(v2.x) + simCenterX, height - (int8_t)roundFixed(v2.y), WHITE);
+  arduboy.drawLine((int8_t)roundFixed(v2.x) + simCenterX, height - (int8_t)roundFixed(v2.y), (int8_t)roundFixed(v3.x) + simCenterX, height - (int8_t)roundFixed(v3.y), WHITE);
+  arduboy.drawLine((int8_t)roundFixed(v3.x) + simCenterX, height - (int8_t)roundFixed(v3.y), (int8_t)roundFixed(v4.x + simCenterX), height - (int8_t)roundFixed(v4.y), WHITE);
+  arduboy.drawLine((int8_t)roundFixed(v4.x) + simCenterX, height - (int8_t)roundFixed(v4.y), (int8_t)roundFixed(v1.x) + simCenterX, height - (int8_t)roundFixed(v1.y), WHITE);
 }
 
-// A vertical stack with spinning toy
+
 static void Demo4(Body* b, bool oneMore = false) {
   if (oneMore) {
-    b->Set(Vec2(7.0, 5.0), 1.0);
-    b->position.Set(22, 45);
+    b->Set(Vec2(5.0, 5.0), 0.25);
+    b->friction = 0.2;
+    b->angularVelocity = -10.0;
+    b->position.Set(-64, 10);
+    b->velocity.Set(60, 25);
     world.Add(b);
     ++b; ++numBodies;
   }
-
-  //the floor
+  // Floor
   b->Set(Vec2(100.0, 20.0), FLT_MAX);
   b->friction = 0.2;
-  b->position.Set(0.0, -0.5 * b->width.y);
+  b->position.Set(0, -9); //center of rectangle;
   b->rotation = 0.0;
   world.Add(b);
   ++b; ++numBodies;
 
-  // add a spinning body of size 10x5
-  b->Set(Vec2(10.0, 5.0), 1.0);
+  //Spinning toy
+  b->Set(Vec2(5.0, 10.0), 1.0);
   b->friction = 0.2;
-  b->angularVelocity = 10.0;
-  b->position.Set(33, 45);
+  b->angularVelocity = -8.0;
+  b->position.Set(5, 60);
   world.Add(b);
   ++b; ++numBodies;
 
-  // add a couple more bodies in a stack
+  //Tiny stack
   for (int i = 0; i < 2; ++i)
   {
-    b->Set(Vec2(5.0, 10.0), 1.0);
+    b->Set(Vec2(8.0, 15.0), 1.0);
     b->friction = 0.2;
-    SQ7x8 x = 40;
-    //b->angularVelocity = -2.0;
-    b->position.Set(x - i, 10 + 11 * i);
+    b->rotation = 0;
+    b->position.Set(0, 1.1 * b->width.y * (1 + i) - 5);
     world.Add(b);
     ++b; ++numBodies;
   }
@@ -130,11 +131,10 @@ void loop() {
     numBodies = 0;
     Demo4(bodies);
   }
-  
+
   //pause
   if (arduboy.justPressed(A_BUTTON)) {
     isRunning = !isRunning;
   }
-  
   arduboy.display();
 }
